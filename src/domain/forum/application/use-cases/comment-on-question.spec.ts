@@ -30,6 +30,8 @@ describe("Comment on question", () => {
       content: "Xablau teste",
     });
 
-    expect(InMemoryQuestionCommentsRepository);
+    expect(inMemoryQuestionCommentsRepository.items[0].content).toEqual(
+      "Xablau teste"
+    );
   });
 });
