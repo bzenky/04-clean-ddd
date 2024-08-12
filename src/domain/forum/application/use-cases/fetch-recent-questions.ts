@@ -1,13 +1,18 @@
-import { Question } from '../../enterprise/entities/question'
-import { QuestionsRepository } from '../repositories/questions-repository'
+import { Either, left, right } from "@/core/either";
+import { Question } from "../../enterprise/entities/question";
+import { QuestionsRepository } from "../repositories/questions-repository";
+import { ResourceNotFoundError } from "./errors/resource-not-found-error";
 
 interface FetchRecentQuestionsUseCaseRequest {
-  page: number
+  page: number;
 }
 
-interface FetchRecentQuestionsUseCaseResponse {
-  questions: Question[]
-}
+type FetchRecentQuestionsUseCaseResponse = Either<
+  ResourceNotFoundError,
+  {
+    questions: Question[];
+  }
+>;
 
 export class FetchRecentQuestionsUseCase {
   constructor(private questionsRepository: QuestionsRepository) {}
@@ -15,14 +20,14 @@ export class FetchRecentQuestionsUseCase {
   async execute({
     page,
   }: FetchRecentQuestionsUseCaseRequest): Promise<FetchRecentQuestionsUseCaseResponse> {
-    const questions = await this.questionsRepository.findManyRecent({ page })
+    const questions = await this.questionsRepository.findManyRecent({ page });
 
     if (!questions) {
-      throw new Error('Question not found')
+      return left(new ResourceNotFoundError());
     }
 
-    return {
+    return right({
       questions,
-    }
+    });
   }
 }
